@@ -1,13 +1,20 @@
 
 # Term paper, sprint 13
 
-## API server implementation using Express framework
+## REST API server 'Mesto'
 
 **The following queries work:**
 
 - **GET localhost:3000/users**
+- **GET localhost:3000/users/userId**
+- **POST localhost:3000/users/users**
+- **PATCH localhost:3000/users/me**
+- **PATCH localhost:3000/users/me/avatar**
 - **GET localhost:3000/cards**
-- **GET localhost:3000/users/8340d0ec33270a25f2413b69**
+- **POST localhost:3000/cards**
+- **DELETE localhost:3000/cards/cardId**
+- **PUT localhost:3000/cards/cardId/likes**
+- **DELETE localhost:3000/cards/cardId/likes**
 - **Wrong URLs return status 404**
 
 ## Installation:

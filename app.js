@@ -1,4 +1,3 @@
-/* eslint-disable import/no-dynamic-require */
 const express = require('express');
 
 const app = express();
