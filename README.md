@@ -1,3 +1,4 @@
+
 # Term paper, sprint 13
 
 ## API server implementation using Express framework
@@ -22,3 +23,4 @@
 
 **Development:**
 `npm run dev`
+
