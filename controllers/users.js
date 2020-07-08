@@ -3,7 +3,7 @@ const User = require('../models/user');
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => {
-      res.send(users);
+      res.send({ data: users });
     })
     .catch((err) => {
       console.log(err);
@@ -13,11 +13,10 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getUserById = async (req, res) => {
   try {
-    const found = await User.findById(req.params.id)
-      .orFail(new Error('Пользователь не найден'));
-    res.send({ user: found });
+    const user = await User.findById(req.params.id)
+      .orFail(new Error({ message: 'Пользователь не найден' }));
+    res.send({ data: user });
   } catch (err) {
-    // console.log(err.message);
     res.status(404).send(err.message);
   }
 };
@@ -32,23 +31,23 @@ module.exports.createUser = (req, res) => {
 module.exports.updateUserProfile = async (req, res) => {
   try {
     const { name, about } = req.body;
-    const found = await User.findByIdAndUpdate(req.user._id, { name, about })
-      .orFail(new Error('Пользователь не найден'));
-    res.send({ user: found });
+    const opts = { runValidators: true, new: true };
+    const user = await User.findByIdAndUpdate(req.user._id, { name, about }, opts)
+      .orFail(new Error({ message: 'Пользователь не найден' }));
+    res.send({ data: user });
   } catch (err) {
-    // console.log(err.message);
-    res.status(404).send(err.message);
+    res.status(400).send(err.message);
   }
 };
 
 module.exports.updateUserAvatar = async (req, res) => {
   try {
     const { avatar } = req.body;
-    const found = await User.findByIdAndUpdate(req.user._id, { avatar })
-      .orFail(new Error('Пользователь не найден'));
-    res.send({ user: found });
+    const opts = { runValidators: true, new: true };
+    const user = await User.findByIdAndUpdate(req.user._id, { avatar }, opts)
+      .orFail(new Error({ message: 'Пользователь не найден' }));
+    res.send({ data: user });
   } catch (err) {
-    // console.log(err.message);
-    res.status(404).send(err.message);
+    res.status(400).send(err.message);
   }
 };

@@ -18,8 +18,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
 });
 
-// app.use(express.static(path.join(__dirname, 'public')));
-
 app.use((req, res, next) => {
   req.user = {
     _id: '5f0327ddbd97500a80f7b19b',

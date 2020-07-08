@@ -3,7 +3,7 @@ const Card = require('../models/card');
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((cards) => {
-      res.send(cards);
+      res.send({ data: cards });
     })
     .catch((err) => {
       console.log(err);
@@ -13,35 +13,25 @@ module.exports.getCards = (req, res) => {
 
 module.exports.createCard = (req, res) => {
   const {
-    name, link, likes, createdAt,
+    name, link, likes,
   } = req.body;
 
   Card.create({
-    name, link, owner: req.user._id, likes, createdAt,
+    name, link, owner: req.user._id, likes,
   })
     .then((newCard) => res.send({ data: newCard }))
-    .catch((err) => res.status(404).send(err.message));
+    .catch((err) => res.status(400).send(err.message));
 };
-
-/*
-module.exports.deleteCard = (req, res) => {
-  // console.log('req.params.id=', req.params.id);
-  Card.findByIdAndRemove(req.params.id)
-    .then((card) => res.send({ data: card }))
-    .catch((err) => res.status(500).send(err));
-};
-*/
 
 module.exports.deleteCard = async (req, res) => {
   try {
     await Card.findByIdAndRemove(req.params.id)
       .then((card) => {
-        if (!card) res.status(404).send({ message: 'Пользователь не найден' });
+        if (!card) res.status(400).send({ message: `Карточка с id=${req.params.id} не найдена` });
         else res.send({ data: card });
       })
       .catch((err) => res.status(500).send(err));
   } catch (err) {
-    // console.log(err.message);
     res.status(500).send(err.message);
   }
 };
@@ -50,13 +40,12 @@ module.exports.likeCard = async (req, res) => {
   try {
     const found = await Card.findByIdAndUpdate(
       req.params.cardId,
-      { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
+      { $addToSet: { likes: req.user._id } },
       { new: true },
     )
-      .orFail(new Error('Пользователь не найден'));
-    res.send({ card: found });
+      .orFail(new Error({ message: `Карточка с id=${req.params.cardId} не найдена` }));
+    res.send({ data: found });
   } catch (err) {
-    // console.log(err.message);
     res.status(404).send(err.message);
   }
 };
@@ -68,10 +57,9 @@ module.exports.dislikeCard = async (req, res) => {
       { $pull: { likes: req.user._id } },
       { new: true },
     )
-      .orFail(new Error('Пользователь не найден'));
-    res.send({ card: found });
+      .orFail(new Error({ message: `Карточка с id=${req.params.cardId} не найдена` }));
+    res.send({ data: found });
   } catch (err) {
-    // console.log(err.message);
     res.status(404).send(err.message);
   }
 };

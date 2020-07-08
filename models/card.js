@@ -1,17 +1,18 @@
 const mongoose = require('mongoose');
+const validatorModule = require('validator');
 
 const cardSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
     minlength: 2,
     maxlength: 30,
+    required: [true, 'Поле должно содержать значение'],
   },
   link: {
     type: String,
     validate: {
-      validator: (v) => /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/.test(v),
-      message: (props) => `${props.value} некорректный формат ссылки!`,
+      validator: (v) => validatorModule.isURL(v),
+      message: (props) => `"${props.value}" некорректный формат ссылки!`,
     },
     required: [true, 'Ссылка на изображение обязательна'],
   },
