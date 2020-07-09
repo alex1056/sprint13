@@ -13,11 +13,11 @@ module.exports.getCards = (req, res) => {
 
 module.exports.createCard = (req, res) => {
   const {
-    name, link, likes,
+    name, link,
   } = req.body;
 
   Card.create({
-    name, link, owner: req.user._id, likes,
+    name, link, owner: req.user._id,
   })
     .then((newCard) => res.send({ data: newCard }))
     .catch((err) => res.status(400).send(err.message));
@@ -27,7 +27,7 @@ module.exports.deleteCard = async (req, res) => {
   try {
     await Card.findByIdAndRemove(req.params.id)
       .then((card) => {
-        if (!card) res.status(400).send({ message: `Карточка с id=${req.params.id} не найдена` });
+        if (!card) res.status(404).send({ message: `Карточка с id=${req.params.id} не найдена` });
         else res.send({ data: card });
       })
       .catch((err) => res.status(500).send(err));
@@ -43,7 +43,7 @@ module.exports.likeCard = async (req, res) => {
       { $addToSet: { likes: req.user._id } },
       { new: true },
     )
-      .orFail(new Error({ message: `Карточка с id=${req.params.cardId} не найдена` }));
+      .orFail(new Error(`Карточка с id=${req.params.cardId} не найдена`));
     res.send({ data: found });
   } catch (err) {
     res.status(404).send(err.message);
@@ -57,7 +57,7 @@ module.exports.dislikeCard = async (req, res) => {
       { $pull: { likes: req.user._id } },
       { new: true },
     )
-      .orFail(new Error({ message: `Карточка с id=${req.params.cardId} не найдена` }));
+      .orFail(new Error(`Карточка с id=${req.params.cardId} не найдена`));
     res.send({ data: found });
   } catch (err) {
     res.status(404).send(err.message);

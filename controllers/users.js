@@ -14,7 +14,7 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id)
-      .orFail(new Error({ message: 'Пользователь не найден' }));
+      .orFail(new Error(`Пользователь с id=${req.params.id} не найдена`));
     res.send({ data: user });
   } catch (err) {
     res.status(404).send(err.message);
@@ -25,7 +25,7 @@ module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
     .then((newUser) => res.send({ data: newUser }))
-    .catch((err) => res.status(404).send(err.message));
+    .catch((err) => res.status(400).send(err.message));
 };
 
 module.exports.updateUserProfile = async (req, res) => {
@@ -33,7 +33,7 @@ module.exports.updateUserProfile = async (req, res) => {
     const { name, about } = req.body;
     const opts = { runValidators: true, new: true };
     const user = await User.findByIdAndUpdate(req.user._id, { name, about }, opts)
-      .orFail(new Error({ message: 'Пользователь не найден' }));
+      .orFail(new Error(`Пользователь с id=${req.user._id} не найден`));
     res.send({ data: user });
   } catch (err) {
     res.status(400).send(err.message);
@@ -45,7 +45,7 @@ module.exports.updateUserAvatar = async (req, res) => {
     const { avatar } = req.body;
     const opts = { runValidators: true, new: true };
     const user = await User.findByIdAndUpdate(req.user._id, { avatar }, opts)
-      .orFail(new Error({ message: 'Пользователь не найден' }));
+      .orFail(new Error(`Пользователь с id=${req.user._id} не найден`));
     res.send({ data: user });
   } catch (err) {
     res.status(400).send(err.message);
