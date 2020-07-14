@@ -23,43 +23,43 @@ module.exports.createCard = (req, res) => {
     .catch((err) => res.status(400).send(err.message));
 };
 
-module.exports.deleteCard = async (req, res) => {
-  try {
-    await Card.findByIdAndRemove(req.params.id)
-      .then((card) => {
-        if (!card) res.status(404).send({ message: `Карточка с id=${req.params.id} не найдена` });
-        else res.send({ data: card });
-      })
-      .catch((err) => res.status(500).send(err));
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
+module.exports.deleteCard = (req, res) => {
+  Card.findOneAndRemove({ _id: req.params.id, owner: req.user._id })
+    .then((found) => {
+      if (!found) {
+        return res.status(403).send({ message: 'Карточка не найдена, либо нет доступа к удалению карточки' });
+      }
+      return res.send(found);
+    })
+    .catch((err) => res.status(500).send(err));
 };
 
-module.exports.likeCard = async (req, res) => {
-  try {
-    const found = await Card.findByIdAndUpdate(
-      req.params.cardId,
-      { $addToSet: { likes: req.user._id } },
-      { new: true },
-    )
-      .orFail(new Error(`Карточка с id=${req.params.cardId} не найдена`));
-    res.send({ data: found });
-  } catch (err) {
-    res.status(404).send(err.message);
-  }
+module.exports.likeCard = (req, res) => {
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $addToSet: { likes: req.user._id } },
+    { new: true },
+  )
+    .then((found) => {
+      if (!found) {
+        return res.status(404).send({ message: `Карточка с id=${req.params.cardId} не найдена` });
+      }
+      return res.send(found);
+    })
+    .catch((err) => res.status(500).send(err));
 };
 
-module.exports.dislikeCard = async (req, res) => {
-  try {
-    const found = await Card.findByIdAndUpdate(
-      req.params.cardId,
-      { $pull: { likes: req.user._id } },
-      { new: true },
-    )
-      .orFail(new Error(`Карточка с id=${req.params.cardId} не найдена`));
-    res.send({ data: found });
-  } catch (err) {
-    res.status(404).send(err.message);
-  }
+module.exports.dislikeCard = (req, res) => {
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $pull: { likes: req.user._id } },
+    { new: true },
+  )
+    .then((found) => {
+      if (!found) {
+        return res.status(404).send({ message: `Карточка с id=${req.params.cardId} не найдена` });
+      }
+      return res.send(found);
+    })
+    .catch((err) => res.status(500).send(err));
 };
